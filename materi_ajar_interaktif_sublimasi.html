@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi Ajar Interaktif: Sublimasi - MGMP IPA MTs Kota Malang</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load React and ReactDOM -->
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    
+    <!-- Load Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Load FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        heading: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6', // primary purple for Sublimation theme
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            500: '#f59e0b', // amber
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animations for Virtual Lab */
+        @keyframes vapor-rise {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
+        }
+        .vapor-particle {
+            animation: vapor-rise 2s infinite ease-out;
+            transform-origin: center bottom;
+        }
+        
+        @keyframes flicker {
+            0% { transform: scale(1) skewX(0deg); opacity: 0.9; }
+            50% { transform: scale(1.1) skewX(-2deg); opacity: 1; }
+            100% { transform: scale(0.9) skewX(2deg); opacity: 0.8; }
+        }
+        .flame-anim {
+            animation: flicker 0.1s infinite alternate;
+            transform-origin: bottom center;
+        }
+
+        /* Markdown styling for Materi */
+        .prose p { margin-bottom: 1rem; line-height: 1.7; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .prose strong { color: #6d28d9; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Custom Modal Component for alerts
+        const Modal = ({ isOpen, title, message, onClose, type = 'info' }) => {
+            if (!isOpen) return null;
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'warning' ? 'bg-accent-500' : 'bg-brand-500';
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900 bg-opacity-50 transition-opacity">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all animate-[fadeIn_0.3s_ease-out]">
+                        <div className={`${bgColor} px-6 py-4 flex items-center gap-3 text-white`}>
+                            <i className={`fas ${icon} text-2xl`}></i>
+                            <h3 className="text-lg font-heading font-bold">{title}</h3>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-slate-600 mb-6">{message}</p>
+                            <button 
+                                onClick={onClose}
+                                className={`${bgColor} hover:opacity-90 text-white font-semibold py-2 px-6 rounded-lg w-full transition-colors shadow-sm`}
+                            >
+                                Mengerti
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Pendahuluan = () => (
+            <div className="animate-[fadeIn_0.5s_ease-in-out]">
+                <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6 border-t-4 border-brand-500">
+                    <h2 className="text-2xl md:text-3xl font-heading font-bold text-brand-800 mb-4">
+                        <i className="fas fa-book-open mr-3"></i>Pendahuluan
+                    </h2>
+                    <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                        Selamat datang di Materi Ajar Interaktif Ilmu Pengetahuan Alam (IPA) Kelas VIII. Pada modul ini, kita akan menjelajahi salah satu metode pemisahan campuran yang unik yaitu <strong>Sublimasi (Penyubliman)</strong>.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-brand-50 rounded-xl p-5 border border-brand-100">
+                            <h3 className="text-xl font-semibold text-brand-700 mb-3 flex items-center">
+                                <i className="fas fa-bullseye mr-2 text-brand-500"></i> Tujuan Pembelajaran
+                            </h3>
+                            <ul className="list-disc list-inside text-slate-700 space-y-2">
+                                <li>Peserta didik dapat menjelaskan konsep dasar pemisahan campuran dengan metode sublimasi.</li>
+                                <li>Peserta didik dapat mengidentifikasi campuran yang dapat dipisahkan menggunakan sublimasi.</li>
+                                <li>Peserta didik dapat menyebutkan fungsi alat dan bahan dalam percobaan sublimasi.</li>
+                                <li>Peserta didik dapat mensimulasikan proses sublimasi melalui laboratorium virtual.</li>
+                            </ul>
+                        </div>
+                        
+                        <div className="bg-amber-50 rounded-xl p-5 border border-amber-100">
+                            <h3 className="text-xl font-semibold text-amber-700 mb-3 flex items-center">
+                                <i className="fas fa-lightbulb mr-2 text-amber-500"></i> Apersepsi
+                            </h3>
+                            <p className="text-slate-700 mb-3">
+                                Pernahkah kamu melihat kapur barus (kamper) di lemari pakaian yang lama-kelamaan mengecil dan habis? Ke mana perginya kapur barus tersebut?
+                            </p>
+                            <p className="text-slate-700">
+                                Kapur barus tersebut tidak hilang, melainkan berubah wujud langsung dari padat menjadi gas. Sifat unik inilah yang dimanfaatkan ilmuwan untuk memurnikan zat melalui metode Sublimasi!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const Materi = () => (
+            <div className="animate-[fadeIn_0.5s_ease-in-out] space-y-6">
+                <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border-t-4 border-brand-500 prose max-w-none">
+                    <h2 className="text-2xl md:text-3xl font-heading font-bold text-brand-800 mb-4">
+                        <i className="fas fa-microscope mr-3"></i>Pemisahan Campuran dengan Sublimasi
+                    </h2>
+                    
+                    <h3 className="text-xl font-semibold text-brand-600 mt-6 mb-2">1. Pengertian Sublimasi</h3>
+                    <p>
+                        <strong>Sublimasi</strong> adalah metode pemisahan campuran yang didasarkan pada campuran zat yang memiliki satu zat yang dapat menyublim (perubahan wujud padat ke gas tanpa melalui fasa cair), sedangkan zat yang lainnya tidak dapat menyublim.
+                    </p>
+                    <p>
+                        Prinsip kerjanya adalah dengan memanaskan campuran padat. Zat yang dapat menyublim akan berubah menjadi gas. Gas tersebut kemudian ditangkap dan didinginkan (biasanya dengan bantuan es batu) sehingga kembali mengkristal menjadi zat padat yang murni di permukaan benda pendingin.
+                    </p>
+
+                    <h3 className="text-xl font-semibold text-brand-600 mt-6 mb-2">2. Rangkaian Alat Sublimasi Sederhana</h3>
+                    <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 my-4 flex flex-col md:flex-row items-center gap-6">
+                        <div className="w-full md:w-1/2 flex justify-center">
+                            {/* Static SVG of Sublimation apparatus for Materi */}
+                            <svg viewBox="0 0 300 300" className="w-full max-w-xs drop-shadow-md">
+                                {/* Tripod & Burner */}
+                                <rect x="90" y="240" width="120" height="10" rx="3" fill="#64748b" />
+                                <rect x="110" y="160" width="80" height="5" fill="#334155" />
+                                <path d="M110 160 L90 240 M190 160 L210 240 M150 160 L150 240" stroke="#475569" strokeWidth="4" />
+                                <rect x="135" y="210" width="30" height="30" fill="#475569" rx="2" />
+                                <path d="M140 210 Q150 180 160 210 Z" fill="#f59e0b" />
+                                
+                                {/* Evaporating Dish */}
+                                <path d="M90 150 Q150 170 210 150 L200 160 Q150 175 100 160 Z" fill="#cbd5e1" />
+                                <path d="M120 150 Q150 160 180 150 Z" fill="#9ca3af" /> {/* Mixture */}
+                                
+                                {/* Watch Glass / Kaca Arloji (Inverted) */}
+                                <path d="M90 150 Q150 130 210 150" fill="none" stroke="#bae6fd" strokeWidth="4" />
+                                
+                                {/* Ice Cubes */}
+                                <g transform="translate(140, 125)">
+                                    <rect x="0" y="0" width="15" height="15" rx="2" fill="#7dd3fc" opacity="0.8" transform="rotate(15)" />
+                                    <rect x="-10" y="5" width="12" height="12" rx="2" fill="#7dd3fc" opacity="0.9" transform="rotate(-10)" />
+                                    <rect x="15" y="-5" width="18" height="18" rx="2" fill="#38bdf8" opacity="0.7" transform="rotate(45)" />
+                                </g>
+
+                                {/* Sublimated Crystals */}
+                                <path d="M110 148 Q150 135 190 148" fill="none" stroke="#e9d5ff" strokeWidth="3" strokeDasharray="2 4" />
+                            </svg>
+                        </div>
+                        <div className="w-full md:w-1/2 text-sm text-slate-600">
+                            <ul className="space-y-3">
+                                <li><span className="font-bold text-brand-700">Kasa & Kaki Tiga:</span> Penyangga wadah selama pemanasan.</li>
+                                <li><span className="font-bold text-brand-700">Pembakar Spirtus/Bunsen:</span> Sumber panas untuk menyublimkan zat.</li>
+                                <li><span className="font-bold text-brand-700">Cawan Penguap:</span> Wadah untuk meletakkan campuran kotor.</li>
+                                <li><span className="font-bold text-brand-700">Kaca Arloji / Corong Terbalik:</span> Penutup cawan yang berfungsi sebagai media tempat menempelnya kristal murni.</li>
+                                <li><span className="font-bold text-brand-700">Es Batu:</span> Diletakkan di atas penutup untuk mendinginkan uap gas secara cepat agar langsung mengkristal (deposisi).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 className="text-xl font-semibold text-brand-600 mt-6 mb-2">3. Contoh Campuran yang Dipisahkan</h3>
+                    <div className="grid sm:grid-cols-2 gap-4 my-4">
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 flex items-start gap-3">
+                            <div className="bg-brand-100 text-brand-600 p-2 rounded-lg">
+                                <i className="fas fa-snowplow fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Pemurnian Kapur Barus (Kamper)</h4>
+                                <p className="text-sm text-slate-500">Memisahkan kapur barus yang tercampur dengan pasir atau debu. Kapur barus akan menyublim, sedangkan pasir tertinggal di cawan.</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 flex items-start gap-3">
+                            <div className="bg-brand-100 text-brand-600 p-2 rounded-lg">
+                                <i className="fas fa-vial fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Pemurnian Iodium</h4>
+                                <p className="text-sm text-slate-500">Kristal iodium yang kotor dapat dimurnikan dengan cara sublimasi karena iodium mudah menguap saat dipanaskan.</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 flex items-start gap-3">
+                            <div className="bg-brand-100 text-brand-600 p-2 rounded-lg">
+                                <i className="fas fa-coffee fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Kopi Bebas Kafein</h4>
+                                <p className="text-sm text-slate-500">Sublimasi kadang dimanfaatkan dalam pemisahan kafein dari biji kopi menggunakan bantuan zat khusus yang mudah menyublim.</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 flex items-start gap-3">
+                            <div className="bg-brand-100 text-brand-600 p-2 rounded-lg">
+                                <i className="fas fa-wind fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Dry Ice (Es Kering)</h4>
+                                <p className="text-sm text-slate-500">Es kering (CO2 padat) pada suhu ruang akan langsung menyublim menjadi gas CO2 tanpa mencair terlebih dahulu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const VirtualLab = () => {
+            const [isHeating, setIsHeating] = useState(false);
+            const [temp, setTemp] = useState(25); 
+            const [sublimated, setSublimated] = useState(0); // 0 to 100%
+            const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+
+            const triggerTemp = 60; // Temp where sublimation starts rapidly
+            const maxSublimated = 100;
+            const timerRef = useRef(null);
+
+            // Simulation Logic
+            useEffect(() => {
+                if (isHeating) {
+                    timerRef.current = setInterval(() => {
+                        setTemp(prevTemp => {
+                            let newTemp = prevTemp;
+                            
+                            // Heat up steadily
+                            if (prevTemp < 120) {
+                                newTemp = prevTemp + 1.5;
+                            }
+
+                            // Sublimation happens when temp is high enough
+                            if (newTemp >= triggerTemp) {
+                                setSublimated(prev => {
+                                    if (prev < maxSublimated) {
+                                        return prev + 1.5; // speed of sublimation
+                                    }
+                                    return prev;
+                                });
+                            }
+                            
+                            return newTemp;
+                        });
+                    }, 150); // Tick rate
+                } else {
+                    clearInterval(timerRef.current);
+                }
+
+                return () => clearInterval(timerRef.current);
+            }, [isHeating]);
+
+            // Auto stop when fully sublimated
+            useEffect(() => {
+                if (sublimated >= maxSublimated && isHeating) {
+                    setIsHeating(false);
+                    setModal({
+                        isOpen: true,
+                        title: 'Proses Sublimasi Selesai',
+                        message: 'Seluruh kapur barus telah berubah menjadi gas dan mengkristal kembali di dasar kaca arloji karena didinginkan oleh es batu. Pasir / kotoran tertinggal di cawan penguap.',
+                        type: 'success'
+                    });
+                }
+            }, [sublimated, isHeating]);
+
+            const handleToggleHeating = () => {
+                if (sublimated >= maxSublimated) {
+                    setModal({
+                        isOpen: true,
+                        title: 'Perhatian',
+                        message: 'Percobaan sudah selesai. Silakan reset alat (Ulangi Percobaan) untuk mencoba lagi.',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                setIsHeating(!isHeating);
+            };
+
+            const handleReset = () => {
+                setIsHeating(false);
+                setTemp(25);
+                setSublimated(0);
+            };
+
+            // Derive visual states
+            const isSublimating = temp >= triggerTemp && sublimated < maxSublimated;
+            const crystalOpacity = sublimated / maxSublimated;
+            const camphorInDishSize = 1 - (sublimated / maxSublimated);
+
+            // Vapor particles generation
+            const renderVapors = () => {
+                if (!isSublimating) return null;
+                const particles = [];
+                for (let i = 0; i < 8; i++) {
+                    const delay = (i * 0.3) + "s";
+                    const xOffset = (Math.random() * 60) - 30;
+                    particles.push(
+                        <circle 
+                            key={i} 
+                            cx={xOffset} 
+                            cy="-5" 
+                            r={Math.random() * 4 + 2} 
+                            fill="#e9d5ff" 
+                            opacity="0.6"
+                            className="vapor-particle" 
+                            style={{animationDelay: delay}} 
+                        />
+                    );
+                }
+                return particles;
+            };
+
+            return (
+                <div className="animate-[fadeIn_0.5s_ease-in-out]">
+                    <Modal 
+                        isOpen={modal.isOpen} 
+                        title={modal.title} 
+                        message={modal.message} 
+                        type={modal.type} 
+                        onClose={() => setModal({ ...modal, isOpen: false })} 
+                    />
+                    
+                    <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border-t-4 border-brand-500">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                            <div>
+                                <h2 className="text-2xl font-heading font-bold text-brand-800">
+                                    <i className="fas fa-laptop-code mr-3"></i>Laboratorium Virtual
+                                </h2>
+                                <p className="text-slate-500 text-sm mt-1">Simulasi Pemurnian Kapur Barus dari Pasir</p>
+                            </div>
+                            <div className="mt-4 md:mt-0 flex gap-3">
+                                <button 
+                                    onClick={handleToggleHeating}
+                                    className={`${isHeating ? 'bg-red-500 hover:bg-red-600' : 'bg-brand-500 hover:bg-brand-600'} text-white px-5 py-2 rounded-lg font-semibold shadow-sm transition-colors flex items-center`}
+                                >
+                                    <i className={`fas ${isHeating ? 'fa-stop-circle' : 'fa-play-circle'} mr-2`}></i>
+                                    {isHeating ? 'Matikan Pemanas' : 'Nyalakan Pemanas'}
+                                </button>
+                                <button 
+                                    onClick={handleReset}
+                                    className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-2 rounded-lg font-semibold shadow-sm transition-colors flex items-center"
+                                >
+                                    <i className="fas fa-redo mr-2"></i> Ulangi
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Interactive Canvas Area */}
+                        <div className="bg-slate-800 rounded-xl p-4 md:p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-center min-h-[450px]">
+                            
+                            {/* Control Dashboard Panel */}
+                            <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur text-white p-4 rounded-xl border border-slate-700 w-48 shadow-lg z-10">
+                                <div className="mb-3">
+                                    <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Status Alat</div>
+                                    <div className="flex items-center">
+                                        <div className={`w-3 h-3 rounded-full mr-2 ${isHeating ? 'bg-red-500 animate-pulse' : 'bg-slate-500'}`}></div>
+                                        <span className="text-sm font-medium">{isHeating ? 'MEMANASKAN' : 'MATI'}</span>
+                                    </div>
+                                </div>
+                                <div className="mb-3">
+                                    <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Suhu Perkiraan</div>
+                                    <div className="text-2xl font-bold font-mono text-brand-400">{Math.round(temp)}°C</div>
+                                </div>
+                                <div>
+                                    <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Kemurnian Terkumpul</div>
+                                    <div className="w-full bg-slate-700 rounded-full h-2.5 mb-1 mt-2">
+                                        <div className="bg-purple-400 h-2.5 rounded-full transition-all duration-300" style={{ width: `${sublimated}%` }}></div>
+                                    </div>
+                                    <div className="text-right text-xs text-slate-400">{Math.round(sublimated)}%</div>
+                                </div>
+                            </div>
+
+                            {/* SVG Simulation Graphic */}
+                            <svg viewBox="0 0 500 450" className="w-full max-w-2xl mt-12 md:mt-0 drop-shadow-xl z-0">
+                                <defs>
+                                    <linearGradient id="dishGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor="#f8fafc" />
+                                        <stop offset="100%" stopColor="#94a3b8" />
+                                    </linearGradient>
+                                    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.6"/>
+                                        <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.2"/>
+                                    </linearGradient>
+                                </defs>
+
+                                {/* Background desk */}
+                                <rect x="50" y="380" width="400" height="15" rx="5" fill="#334155" />
+
+                                {/* Tripod Stand */}
+                                <g stroke="#475569" strokeWidth="8" strokeLinecap="round">
+                                    <line x1="180" y1="260" x2="140" y2="380" />
+                                    <line x1="320" y1="260" x2="360" y2="380" />
+                                    <line x1="250" y1="260" x2="250" y2="380" />
+                                </g>
+                                {/* Wire Gauze */}
+                                <rect x="160" y="255" width="180" height="8" rx="2" fill="#94a3b8" />
+                                <rect x="150" y="260" width="200" height="4" fill="#334155" />
+
+                                {/* Bunsen Burner */}
+                                <g transform="translate(250, 340)">
+                                    <rect x="-25" y="0" width="50" height="40" rx="4" fill="#64748b" />
+                                    <rect x="-30" y="35" width="60" height="6" rx="2" fill="#475569" />
+                                    <rect x="-10" y="-15" width="20" height="15" fill="#94a3b8" />
+                                    {/* Flame */}
+                                    {isHeating && (
+                                        <path d="M-15 -15 Q0 -60 15 -15 Z" fill="#fb923c" className="flame-anim" />
+                                    )}
+                                    {isHeating && temp > 40 && (
+                                        <path d="M-8 -15 Q0 -40 8 -15 Z" fill="#fef08a" className="flame-anim" style={{animationDelay: '0.1s'}} />
+                                    )}
+                                </g>
+
+                                {/* Sublimation System Container */}
+                                <g transform="translate(250, 245)">
+                                    
+                                    {/* Evaporating Dish (Cawan Penguap) */}
+                                    <path d="M-70 0 Q0 30 70 0 L60 10 Q0 35 -60 10 Z" fill="url(#dishGrad)" />
+                                    
+                                    {/* Mixture in Dish */}
+                                    {/* Sand/Impurities (Always visible) */}
+                                    <path d="M-40 -2 Q0 8 40 -2 Q0 -10 -40 -2 Z" fill="#78716c" opacity="0.9" />
+                                    
+                                    {/* Camphor (Disappears as it sublimates) */}
+                                    <g transform={`scale(${camphorInDishSize})`} opacity={camphorInDishSize}>
+                                        <path d="M-45 -5 Q0 10 45 -5 Q0 -20 -45 -5 Z" fill="#ffffff" />
+                                        <circle cx="-10" cy="-5" r="4" fill="#f8fafc" />
+                                        <circle cx="15" cy="-8" r="5" fill="#f8fafc" />
+                                        <circle cx="5" cy="-2" r="3" fill="#f8fafc" />
+                                        <circle cx="-25" cy="-3" r="3" fill="#f8fafc" />
+                                    </g>
+
+                                    {/* Sublimating Vapor Animation */}
+                                    {renderVapors()}
+
+                                    {/* Inverted Watch Glass / Corong */}
+                                    <path d="M-75 -5 Q0 -40 75 -5 Q0 -45 -75 -5 Z" fill="url(#glassGrad)" stroke="#bae6fd" strokeWidth="3" />
+                                    
+                                    {/* Crystallized Camphor on the Watch Glass (Appears gradually) */}
+                                    <g opacity={crystalOpacity} fill="#ffffff">
+                                        {/* Left cluster */}
+                                        <path d="M-40 -22 L-35 -15 L-30 -25 L-25 -16 L-20 -24 L-15 -18 L-40 -22" />
+                                        {/* Right cluster */}
+                                        <path d="M40 -22 L35 -15 L30 -25 L25 -16 L20 -24 L15 -18 L40 -22" />
+                                        {/* Center cluster */}
+                                        <path d="M-10 -26 L-5 -19 L0 -28 L5 -20 L10 -27 L-10 -26" />
+                                        {/* Random crystals */}
+                                        <circle cx="-50" cy="-15" r="2" />
+                                        <circle cx="50" cy="-15" r="2" />
+                                        <circle cx="-25" cy="-20" r="1.5" />
+                                        <circle cx="25" cy="-20" r="1.5" />
+                                    </g>
+
+                                    {/* Ice Cubes on top of Watch Glass */}
+                                    <g transform="translate(0, -32)">
+                                        <path d="M-20 0 L-10 -15 L10 -10 L15 5 L-5 10 Z" fill="#7dd3fc" opacity="0.8" />
+                                        <path d="M5 -5 L20 -15 L35 0 L25 15 L5 -5 Z" fill="#38bdf8" opacity="0.7" />
+                                        <path d="M-35 0 L-20 -10 L-5 5 L-15 15 Z" fill="#bae6fd" opacity="0.9" />
+                                        <path d="M-10 -20 L5 -30 L20 -15 L0 -5 Z" fill="#7dd3fc" opacity="0.8" />
+                                    </g>
+                                    
+                                </g>
+
+                                {/* Labels/Tooltips */}
+                                <g transform="translate(45, 185)">
+                                    <rect x="0" y="0" width="60" height="25" rx="4" fill="white" opacity="0.9" />
+                                    <text x="30" y="16" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#334155">Es Batu</text>
+                                    <line x1="60" y1="12" x2="220" y2="28" stroke="white" strokeWidth="1" strokeDasharray="2 2" />
+                                </g>
+                                <g transform="translate(45, 245)">
+                                    <rect x="0" y="0" width="70" height="25" rx="4" fill="white" opacity="0.9" />
+                                    <text x="35" y="16" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#334155">Kaca Arloji</text>
+                                    <line x1="70" y1="12" x2="185" y2="12" stroke="white" strokeWidth="1" strokeDasharray="2 2" />
+                                </g>
+                                <g transform="translate(390, 245)">
+                                    <rect x="0" y="0" width="70" height="25" rx="4" fill="white" opacity="0.9" />
+                                    <text x="35" y="16" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#6d28d9">Kristal Murni</text>
+                                    <line x1="0" y1="12" x2="-100" y2="12" stroke="white" strokeWidth="1" strokeDasharray="2 2" />
+                                </g>
+                            </svg>
+                        </div>
+                        
+                        <div className="bg-purple-50 text-purple-800 p-4 rounded-xl mt-6 border border-purple-200 text-sm flex gap-3">
+                            <i className="fas fa-info-circle mt-0.5 text-purple-600"></i>
+                            <p>
+                                <strong>Petunjuk:</strong> Klik "Nyalakan Pemanas". Amati serbuk kapur barus yang bercampur pasir di dalam cawan penguap. Kapur barus akan menyublim menjadi uap dan menempel (mengkristal) pada bagian bawah kaca arloji karena didinginkan oleh es batu. Pasir akan tertinggal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const LKPD = () => {
+            const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+            
+            const handleSimpan = (e) => {
+                e.preventDefault();
+                setModal({
+                    isOpen: true,
+                    title: 'LKPD Disimpan!',
+                    message: 'Jawaban Lembar Kerja Peserta Didik (Materi Sublimasi) Anda telah berhasil disimpan di sistem lokal.',
+                    type: 'success'
+                });
+            };
+
+            return (
+                <div className="animate-[fadeIn_0.5s_ease-in-out]">
+                    <Modal 
+                        isOpen={modal.isOpen} 
+                        title={modal.title} 
+                        message={modal.message} 
+                        type={modal.type} 
+                        onClose={() => setModal({ ...modal, isOpen: false })} 
+                    />
+
+                    <div className="bg-white rounded-2xl shadow-sm border-t-4 border-brand-500 overflow-hidden">
+                        <div className="p-6 md:p-8 bg-brand-50 border-b border-brand-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div>
+                                <h2 className="text-2xl font-heading font-bold text-brand-800">
+                                    <i className="fas fa-edit mr-3"></i>Lembar Kerja Peserta Didik (LKPD)
+                                </h2>
+                                <p className="text-brand-600 mt-1">Laporan Hasil Pengamatan Simulasi Sublimasi</p>
+                            </div>
+                            <div className="text-brand-500">
+                                <i className="fas fa-file-alt text-4xl opacity-50"></i>
+                            </div>
+                        </div>
+                        
+                        <form onSubmit={handleSimpan} className="p-6 md:p-8 space-y-6">
+                            <div className="grid md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Kelompok / Siswa</label>
+                                    <input type="text" required className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" placeholder="Masukkan nama..." />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Kelas</label>
+                                    <input type="text" required className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" placeholder="Contoh: VIII - A" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                        1. Apa yang terjadi pada campuran kapur barus dan pasir di dalam cawan penguap saat dipanaskan?
+                                    </label>
+                                    <textarea required rows="3" className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none" placeholder="Tuliskan hasil pengamatanmu..."></textarea>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                        2. Mengapa meletakkan es batu di bagian atas kaca arloji/corong penutup sangat penting dalam percobaan ini?
+                                    </label>
+                                    <textarea required rows="3" className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none" placeholder="Tuliskan jawabanmu..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                        3. Zat apa yang akhirnya tertinggal di dasar cawan penguap setelah proses selesai? Mengapa zat tersebut tidak ikut naik ke atas?
+                                    </label>
+                                    <textarea required rows="3" className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none" placeholder="Tuliskan jawabanmu..."></textarea>
+                                </div>
+                                
+                                <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                                    <label className="block text-sm font-bold text-slate-800 mb-2">
+                                        KESIMPULAN:
+                                    </label>
+                                    <textarea required rows="4" className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none" placeholder="Tuliskan kesimpulan mengenai prinsip kerja pemisahan campuran dengan sublimasi..."></textarea>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 flex justify-end">
+                                <button type="submit" className="bg-brand-500 hover:bg-brand-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md transition-colors flex items-center gap-2">
+                                    <i className="fas fa-save"></i> Simpan Hasil LKPD
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const Quiz = () => {
+            const questions = [
+                {
+                    q: "Apa yang dimaksud dengan proses sublimasi pada metode pemisahan campuran?",
+                    options: [
+                        "Perubahan wujud dari cair menjadi gas", 
+                        "Perubahan wujud dari padat langsung menjadi gas", 
+                        "Penyaringan zat padat dari zat cair", 
+                        "Pemisahan zat cair berdasarkan titik didih"
+                    ],
+                    answer: 1
+                },
+                {
+                    q: "Campuran berikut ini yang paling tepat dipisahkan dengan metode sublimasi adalah...",
+                    options: ["Air dan Garam", "Air dan Pasir", "Kapur barus dan Pasir", "Minyak dan Air"],
+                    answer: 2
+                },
+                {
+                    q: "Pada percobaan pemurnian kapur barus, apa fungsi utama meletakkan es batu di atas tutup kaca arloji?",
+                    options: [
+                        "Mendinginkan uap kapur barus agar kembali menjadi kristal padat", 
+                        "Mencegah cawan penguap agar tidak retak", 
+                        "Menambah volume kapur barus", 
+                        "Mendinginkan pasir agar tidak ikut menguap"
+                    ],
+                    answer: 0
+                },
+                {
+                    q: "Zat yang tersisa dan tidak ikut menguap pada cawan penguap (seperti pasir dalam campuran kotor) disebut...",
+                    options: ["Filtrat", "Destilat", "Residu", "Solven"],
+                    answer: 2
+                },
+                {
+                    q: "Selain kapur barus (kamper), zat lain yang sering dimurnikan menggunakan prinsip sublimasi adalah...",
+                    options: ["Garam dapur (NaCl)", "Gula pasir", "Iodium", "Serbuk besi"],
+                    answer: 3
+                }
+            ];
+
+            const [currentQ, setCurrentQ] = useState(0);
+            const [score, setScore] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+            const [selectedOption, setSelectedOption] = useState(null);
+            
+            const handleAnswer = (index) => {
+                setSelectedOption(index);
+                
+                setTimeout(() => {
+                    if (index === questions[currentQ].answer) {
+                        setScore(score + 100/questions.length);
+                    }
+                    
+                    if (currentQ < questions.length - 1) {
+                        setCurrentQ(currentQ + 1);
+                        setSelectedOption(null);
+                    } else {
+                        setShowResult(true);
+                    }
+                }, 600);
+            };
+
+            const resetQuiz = () => {
+                setCurrentQ(0);
+                setScore(0);
+                setShowResult(false);
+                setSelectedOption(null);
+            };
+
+            if (showResult) {
+                return (
+                    <div className="animate-[fadeIn_0.5s_ease-in-out]">
+                        <div className="bg-white rounded-2xl shadow-sm p-8 text-center border-t-4 border-brand-500 max-w-2xl mx-auto">
+                            <i className={`fas ${score >= 80 ? 'fa-trophy text-yellow-500' : 'fa-star text-brand-400'} text-6xl mb-4`}></i>
+                            <h2 className="text-3xl font-heading font-bold text-slate-800 mb-2">Kuis Selesai!</h2>
+                            <p className="text-slate-600 mb-6">Kamu telah menyelesaikan evaluasi materi Sublimasi.</p>
+                            
+                            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 mb-8 inline-block min-w-[250px]">
+                                <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Nilai Kamu</div>
+                                <div className={`text-6xl font-bold ${score >= 80 ? 'text-green-500' : score >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                    {Math.round(score)}
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-center gap-4">
+                                <button onClick={resetQuiz} className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition-colors flex items-center gap-2">
+                                    <i className="fas fa-redo"></i> Coba Lagi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            const q = questions[currentQ];
+
+            return (
+                <div className="animate-[fadeIn_0.5s_ease-in-out] max-w-3xl mx-auto">
+                    <div className="bg-white rounded-2xl shadow-sm overflow-hidden border-t-4 border-brand-500">
+                        <div className="p-6 bg-brand-50 flex justify-between items-center border-b border-brand-100">
+                            <h2 className="text-xl font-heading font-bold text-brand-800">
+                                <i className="fas fa-tasks mr-2"></i> Kuis Evaluasi
+                            </h2>
+                            <div className="bg-white px-4 py-1.5 rounded-full text-sm font-bold text-brand-600 border border-brand-200 shadow-sm">
+                                Pertanyaan {currentQ + 1} / {questions.length}
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 md:p-8">
+                            <div className="w-full bg-slate-100 rounded-full h-2 mb-8">
+                                <div className="bg-brand-400 h-2 rounded-full transition-all duration-300" style={{ width: `${((currentQ) / questions.length) * 100}%` }}></div>
+                            </div>
+
+                            <h3 className="text-lg md:text-xl font-semibold text-slate-800 mb-6 leading-relaxed">
+                                {q.q}
+                            </h3>
+                            
+                            <div className="space-y-3">
+                                {q.options.map((opt, i) => {
+                                    let btnClass = "w-full text-left p-4 border rounded-xl transition-all duration-200 group flex items-center ";
+                                    
+                                    if (selectedOption === i) {
+                                        if (i === q.answer) {
+                                            btnClass += "bg-green-100 border-green-500 text-green-800 font-semibold";
+                                        } else {
+                                            btnClass += "bg-red-100 border-red-500 text-red-800 font-semibold";
+                                        }
+                                    } else {
+                                        btnClass += "border-slate-200 bg-white hover:border-brand-400 hover:bg-brand-50 text-slate-700";
+                                    }
+
+                                    return (
+                                        <button 
+                                            key={i} 
+                                            disabled={selectedOption !== null}
+                                            onClick={() => handleAnswer(i)}
+                                            className={btnClass}
+                                        >
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 text-sm font-bold shrink-0 
+                                                ${selectedOption === i 
+                                                    ? (i === q.answer ? 'bg-green-500 text-white' : 'bg-red-500 text-white') 
+                                                    : 'bg-slate-100 text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600'}`}>
+                                                {String.fromCharCode(65 + i)}
+                                            </div>
+                                            <span>{opt}</span>
+                                            
+                                            {selectedOption === i && i === q.answer && (
+                                                <i className="fas fa-check text-green-600 ml-auto text-xl"></i>
+                                            )}
+                                            {selectedOption === i && i !== q.answer && (
+                                                <i className="fas fa-times text-red-600 ml-auto text-xl"></i>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('pendahuluan');
+
+            const tabs = [
+                { id: 'pendahuluan', label: 'Pendahuluan', icon: 'fa-book-open' },
+                { id: 'materi', label: 'Materi', icon: 'fa-microscope' },
+                { id: 'lab', label: 'Lab Virtual', icon: 'fa-laptop-code' },
+                { id: 'lkpd', label: 'LKPD', icon: 'fa-edit' },
+                { id: 'kuis', label: 'Kuis', icon: 'fa-tasks' },
+            ];
+
+            const renderContent = () => {
+                switch(activeTab) {
+                    case 'pendahuluan': return <Pendahuluan />;
+                    case 'materi': return <Materi />;
+                    case 'lab': return <VirtualLab />;
+                    case 'lkpd': return <LKPD />;
+                    case 'kuis': return <Quiz />;
+                    default: return <Pendahuluan />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col font-sans text-slate-800">
+                    {/* Header */}
+                    <header className="bg-white shadow-sm sticky top-0 z-40">
+                        <div className="container mx-auto px-4 md:px-6">
+                            <div className="flex flex-col md:flex-row items-center justify-between py-4 border-b border-slate-100">
+                                <div className="flex items-center gap-4 mb-4 md:mb-0">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                                        <i className="fas fa-cloud text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h1 className="text-xl md:text-2xl font-heading font-bold text-slate-800 leading-tight">
+                                            Pemisahan Campuran: Sublimasi
+                                        </h1>
+                                        <p className="text-sm font-semibold text-brand-600">IPA Kelas VIII</p>
+                                    </div>
+                                </div>
+                                <div className="text-center md:text-right">
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Disusun Oleh</p>
+                                    <div className="inline-block bg-slate-100 rounded-full px-4 py-1.5 border border-slate-200">
+                                        <span className="text-sm font-bold text-slate-700"><i className="fas fa-users text-brand-500 mr-2"></i>MGMP IPA MTs Kota Malang</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Navigation */}
+                            <nav className="flex overflow-x-auto py-2 md:py-4 gap-2 md:gap-4 no-scrollbar">
+                                {tabs.map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`whitespace-nowrap flex items-center px-4 md:px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200
+                                            ${activeTab === tab.id 
+                                                ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30 translate-y-[-2px]' 
+                                                : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-brand-600 border border-slate-200'}`}
+                                    >
+                                        <i className={`fas ${tab.icon} mr-2`}></i>
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+                    </header>
+
+                    {/* Main Content Area */}
+                    <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
+                        {renderContent()}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-slate-800 text-slate-300 py-8">
+                        <div className="container mx-auto px-6 text-center">
+                            <div className="flex justify-center items-center gap-3 mb-4">
+                                <i className="fas fa-atom text-brand-400 text-2xl"></i>
+                            </div>
+                            <p className="font-heading font-semibold text-lg text-white mb-2">Media Pembelajaran Interaktif Ilmu Pengetahuan Alam</p>
+                            <p className="text-sm opacity-80 mb-4">Materi Fase D - Kurikulum Merdeka</p>
+                            <div className="w-16 h-1 bg-brand-500 mx-auto rounded-full mb-4"></div>
+                            <p className="text-sm font-semibold tracking-wider">
+                                &copy; {new Date().getFullYear()} MGMP IPA MTs Kota Malang
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // Render Application
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
